@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using VideoNotesBackend.Data;
 using VideoNotesBackend.Models;
 
@@ -19,7 +20,7 @@ namespace VideoNotesBackend.Controllers
         [HttpGet(Name = "GetAllVideos")]
         public ActionResult<Video> GetVideos()
         {
-            if(_context.Videos == null)
+            if (_context.Videos == null)
             {
                 return NotFound("No videos found");
             }
@@ -29,16 +30,49 @@ namespace VideoNotesBackend.Controllers
             return Ok(videos);
         }
 
-        [HttpPost(Name = "EditVideo")]
-        public ActionResult<Video> EditVideo(Video v)
+        // Not sure if this works
+        [HttpPost("{id}")]
+        public async Task<ActionResult<Video>> Edit(Guid? id, [Bind("Id, Title, ReleaseDate, Watched, Duration, Rating, Url")] Video videoDetails)
         {
-            if(_context.Videos == null)
+            if (id == null)
             {
-                return NotFound("No videos found");
+                return NotFound("Id is null");
             }
 
-            var videos = _context.Videos;
+            var video = await _context.Videos.FindAsync(id);
 
-            return Ok(videos);
+            if(video == null)
+            {
+                return NotFound("Video not found");
+            }
+
+            // Update the video
+            video.Title = videoDetails.Title;
+            video.ReleaseDate = videoDetails.ReleaseDate;
+            video.Watched = videoDetails.Watched;
+            video.Duration = videoDetails.Duration;
+            video.Rating = videoDetails.Rating;
+            video.URL = videoDetails.URL;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!VideoExists(id.Value))
+                {
+                    return NotFound("Video not found");
+                }
+                else throw;
+            }
+
+            return Ok(video);
         }
+
+        private bool VideoExists(Guid id)
+        {
+            return _context.Videos.Any(v => v.Id == id);
+        }
+    }
 }

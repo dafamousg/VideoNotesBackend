@@ -22,6 +22,6 @@ namespace VideoNotesBackend.Models
         [Url]
         public required string URL { get; set; }
 
-        public ICollection<Note>? Notes { get; set; }
+        //public ICollection<Note>? Notes { get; set; }
     }
 }
