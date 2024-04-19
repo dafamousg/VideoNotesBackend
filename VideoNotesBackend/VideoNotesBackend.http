@@ -1,0 +1,6 @@
+@VideoNotesBackend_HostAddress = http://localhost:5045
+
+GET {{VideoNotesBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
