@@ -27,6 +27,18 @@ namespace VideoNotesBackend.Enums
                 default:
                     throw new ArgumentException("Invalid rating values");
             }
+
+            /** Sugestion switch expression
+             * 
+                return (rating) switch
+                {
+                    Values.HighlyInformative => "Highly Informative",
+                    Values.PartiallyInformative => "Partially Informative",
+                    Values.NotInformative => "Not Informative",
+                    _ => throw new ArgumentException("Invalid rating values"),
+                }; 
+             *
+             */
         }
 
         public static bool IsValidRating(Values rating)

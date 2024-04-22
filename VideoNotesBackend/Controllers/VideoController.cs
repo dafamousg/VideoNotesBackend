@@ -1,11 +1,19 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Nelibur.ObjectMapper;
 using VideoNotesBackend.Data;
 using VideoNotesBackend.Models;
 
 namespace VideoNotesBackend.Controllers
 {
+    public static class RouteNames
+    {
+        public const string GetAllVideos = "GetAll";
+        public const string GetVideoById = "GetById";
+        public const string CreateVideo = "Create";
+    }
+
     [ApiController]
     [Route("api/[controller]")]
     public class VideoController : ControllerBase
@@ -17,7 +25,7 @@ namespace VideoNotesBackend.Controllers
             _context = context;
         }
 
-        [HttpGet(Name = "GetAllVideos")]
+        [HttpGet(RouteNames.GetAllVideos)]
         public ActionResult<Video> GetVideos()
         {
             if (_context.Videos == null)
@@ -30,9 +38,27 @@ namespace VideoNotesBackend.Controllers
             return Ok(videos);
         }
 
-        // Not sure if this works
-        [HttpPost("{id}")]
-        public async Task<ActionResult<Video>> Edit(Guid? id, [Bind("Id, Title, ReleaseDate, Watched, Duration, Rating, Url")] Video videoDetails)
+        [HttpPost(RouteNames.CreateVideo)]
+        public async Task<ActionResult<Video>> CreateVideo(Video video)
+        {
+            if(video == null)
+            {
+                return NotFound("Video Object missing");
+            }
+
+            if(ModelState.IsValid)
+            {
+                _context.Add(video);
+                await _context.SaveChangesAsync();
+
+            }
+
+            return Ok(video);
+        }
+
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Video>> Edit(Guid? id)
         {
             if (id == null)
             {
@@ -46,13 +72,26 @@ namespace VideoNotesBackend.Controllers
                 return NotFound("Video not found");
             }
 
-            // Update the video
-            video.Title = videoDetails.Title;
-            video.ReleaseDate = videoDetails.ReleaseDate;
-            video.Watched = videoDetails.Watched;
-            video.Duration = videoDetails.Duration;
-            video.Rating = videoDetails.Rating;
-            video.URL = videoDetails.URL;
+            return Ok(video);
+        }
+
+        [HttpPost("{id}")]
+        public async Task<ActionResult<Video>> Edit(Guid? id, [FromBody] VideoEditDto editedVideo)
+        {
+            if (id == null)
+            {
+                return NotFound("Id is null");
+            }
+
+            var video = await _context.Videos.FindAsync(id);
+
+            if(video == null)
+            {
+                return NotFound("Video not found");
+            }
+
+            // Compare and Update the video
+            UpdateVideoProps(video, editedVideo);
 
             try
             {
@@ -60,19 +99,30 @@ namespace VideoNotesBackend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!VideoExists(id.Value))
-                {
-                    return NotFound("Video not found");
-                }
-                else throw;
+                return NotFound("Video could not be saved");
             }
 
             return Ok(video);
         }
 
-        private bool VideoExists(Guid id)
+        private static void UpdateVideoProps(Video video, VideoEditDto editedVideo)
         {
-            return _context.Videos.Any(v => v.Id == id);
+            TinyMapper.Bind<VideoEditDto, Video>();
+            var newVideo = TinyMapper.Map<Video>(editedVideo);
+
+            var videoProperties = typeof(Video).GetProperties()
+                .Where(p => p.Name != nameof(Video.Id));
+
+            foreach (var property in videoProperties)
+            {
+                var newValue = property.GetValue(newVideo);
+                var currentValue = property.GetValue(video);
+
+                if(newValue != null && !newValue.Equals(currentValue))
+                {
+                    property.SetValue(video, newValue);
+                }
+            }
         }
     }
 }
