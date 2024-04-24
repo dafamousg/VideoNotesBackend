@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VideoNotesBackend.Data;
+using VideoNotesBackend.Enums;
 using VideoNotesBackend.Models;
 
 namespace VideoNotesBackend.Controllers
@@ -16,8 +17,8 @@ namespace VideoNotesBackend.Controllers
             _context = context;
         }
 
-        [HttpGet("GetAll")]
-        public ActionResult<Rating> GetAll()
+        [HttpGet(RouteNames.GetAll)]
+        public ActionResult<Rating> Get()
         {
             if(_context.Ratings == null)
             {
@@ -27,6 +28,25 @@ namespace VideoNotesBackend.Controllers
             var ratings = _context.Ratings;
 
             return Ok(ratings);
+        }
+        
+        [HttpPost(RouteNames.Create)]
+        public async Task<ActionResult<Rating>> Create(Rating rating)
+        {
+            if(rating == null)
+            {
+                return BadRequest("Rating is null");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            _context.Add(rating);
+            await _context.SaveChangesAsync();
+
+            return Ok(rating);
         }
     }
 }

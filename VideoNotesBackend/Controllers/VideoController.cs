@@ -3,20 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Nelibur.ObjectMapper;
 using VideoNotesBackend.Data;
+using VideoNotesBackend.Enums;
 using VideoNotesBackend.Helpers.Validation;
 using VideoNotesBackend.ModelDto;
 using VideoNotesBackend.Models;
 
 namespace VideoNotesBackend.Controllers
 {
-    public static class RouteNames
-    {
-        public const string GetAllVideos = "GetAll";
-        public const string GetVideoById = "GetById";
-        public const string CreateVideo = "Create";
-        public const string EditVideo = "Edit";
-    }
-
     [ApiController]
     [Route("api/video")]
     public class VideoController : ControllerBase
@@ -28,7 +21,7 @@ namespace VideoNotesBackend.Controllers
             _context = context;
         }
 
-        [HttpGet(RouteNames.GetAllVideos)]
+        [HttpGet(RouteNames.GetAll)]
         public ActionResult<Video> Get()
         {
             if (_context.Videos == null)
@@ -41,7 +34,7 @@ namespace VideoNotesBackend.Controllers
             return Ok(videos);
         }
 
-        [HttpPost(RouteNames.CreateVideo)]
+        [HttpPost(RouteNames.Create)]
         public async Task<ActionResult<Video>> Create(VideoCreate video)
         {
             if (video == null)
@@ -72,7 +65,7 @@ namespace VideoNotesBackend.Controllers
         }
 
 
-        [HttpGet(RouteNames.GetVideoById)]
+        [HttpGet(RouteNames.GetById)]
         public async Task<ActionResult<Video>> GetById(Guid? id)
         {
             if (id == null)
@@ -90,7 +83,7 @@ namespace VideoNotesBackend.Controllers
             return Ok(video);
         }
 
-        [HttpPost(RouteNames.EditVideo)]
+        [HttpPost(RouteNames.Edit)]
         public async Task<ActionResult<Video>> Edit(Guid? id, [FromBody] VideoDto editedVideo)
         {
             if (id == null)
