@@ -14,6 +14,7 @@ namespace VideoNotesBackend.Controllers
         public const string GetAllVideos = "GetAll";
         public const string GetVideoById = "GetById";
         public const string CreateVideo = "Create";
+        public const string EditVideo = "Edit";
     }
 
     [ApiController]
@@ -71,8 +72,8 @@ namespace VideoNotesBackend.Controllers
         }
 
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Video>> Edit(Guid? id)
+        [HttpGet(RouteNames.GetVideoById)]
+        public async Task<ActionResult<Video>> GetById(Guid? id)
         {
             if (id == null)
             {
@@ -89,7 +90,7 @@ namespace VideoNotesBackend.Controllers
             return Ok(video);
         }
 
-        [HttpPost("{id}")]
+        [HttpPost(RouteNames.EditVideo)]
         public async Task<ActionResult<Video>> Edit(Guid? id, [FromBody] VideoDto editedVideo)
         {
             if (id == null)

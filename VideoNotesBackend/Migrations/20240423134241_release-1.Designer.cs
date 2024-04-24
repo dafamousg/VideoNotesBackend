@@ -13,7 +13,7 @@ namespace VideoNotesBackend.Migrations
 {
     [DbContext(typeof(VideoNotesContext))]
     [Migration("20240423134241_release-1")]
-    partial class release1
+    partial class Release1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

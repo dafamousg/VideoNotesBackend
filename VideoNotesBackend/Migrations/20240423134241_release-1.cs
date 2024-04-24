@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace VideoNotesBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class release1 : Migration
+    public partial class Release1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
