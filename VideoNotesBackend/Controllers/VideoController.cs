@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Nelibur.ObjectMapper;
 using VideoNotesBackend.Data;
+using VideoNotesBackend.Helpers.Validation;
+using VideoNotesBackend.ModelDto;
 using VideoNotesBackend.Models;
 
 namespace VideoNotesBackend.Controllers
@@ -15,7 +17,7 @@ namespace VideoNotesBackend.Controllers
     }
 
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/video")]
     public class VideoController : ControllerBase
     {
         private readonly VideoNotesContext _context;
@@ -26,7 +28,7 @@ namespace VideoNotesBackend.Controllers
         }
 
         [HttpGet(RouteNames.GetAllVideos)]
-        public ActionResult<Video> GetVideos()
+        public ActionResult<Video> Get()
         {
             if (_context.Videos == null)
             {
@@ -39,21 +41,33 @@ namespace VideoNotesBackend.Controllers
         }
 
         [HttpPost(RouteNames.CreateVideo)]
-        public async Task<ActionResult<Video>> CreateVideo(Video video)
+        public async Task<ActionResult<Video>> Create(VideoCreate video)
         {
-            if(video == null)
+            if (video == null)
             {
-                return NotFound("Video Object missing");
+                return BadRequest("Video Object missing");
             }
 
-            if(ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(video);
-                await _context.SaveChangesAsync();
-
+                return BadRequest(ModelState);
             }
 
-            return Ok(video);
+            var ratingArray = _context.Ratings;
+
+            if (!RatingValidation.IsValidRating(ratingArray, video.RatingId))
+            {
+                ModelState.AddModelError(nameof(video.RatingId), $"Invalid rating value: {video.RatingId}");
+                return BadRequest(ModelState);
+            }
+
+            TinyMapper.Bind<VideoCreate, Video>();
+            var newVideo = TinyMapper.Map<Video>(video);
+
+            _context.Add(newVideo);
+            await _context.SaveChangesAsync();
+
+            return Ok(newVideo);
         }
 
 
@@ -67,7 +81,7 @@ namespace VideoNotesBackend.Controllers
 
             var video = await _context.Videos.FindAsync(id);
 
-            if(video == null)
+            if (video == null)
             {
                 return NotFound("Video not found");
             }
@@ -76,7 +90,7 @@ namespace VideoNotesBackend.Controllers
         }
 
         [HttpPost("{id}")]
-        public async Task<ActionResult<Video>> Edit(Guid? id, [FromBody] VideoEditDto editedVideo)
+        public async Task<ActionResult<Video>> Edit(Guid? id, [FromBody] VideoDto editedVideo)
         {
             if (id == null)
             {
@@ -85,7 +99,7 @@ namespace VideoNotesBackend.Controllers
 
             var video = await _context.Videos.FindAsync(id);
 
-            if(video == null)
+            if (video == null)
             {
                 return NotFound("Video not found");
             }
@@ -105,9 +119,9 @@ namespace VideoNotesBackend.Controllers
             return Ok(video);
         }
 
-        private static void UpdateVideoProps(Video video, VideoEditDto editedVideo)
+        private static void UpdateVideoProps(Video video, VideoDto editedVideo)
         {
-            TinyMapper.Bind<VideoEditDto, Video>();
+            TinyMapper.Bind<VideoDto, Video>();
             var newVideo = TinyMapper.Map<Video>(editedVideo);
 
             var videoProperties = typeof(Video).GetProperties()
@@ -118,7 +132,7 @@ namespace VideoNotesBackend.Controllers
                 var newValue = property.GetValue(newVideo);
                 var currentValue = property.GetValue(video);
 
-                if(newValue != null && !newValue.Equals(currentValue))
+                if (newValue != null && !newValue.Equals(currentValue))
                 {
                     property.SetValue(video, newValue);
                 }

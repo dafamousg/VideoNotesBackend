@@ -12,6 +12,7 @@ namespace VideoNotesBackend.Data
 
         public DbSet<Video> Videos { get; set; }
         public DbSet<Note> Notes { get; set; }
+        public DbSet<Rating> Ratings { get; set; }
 
     }
 }

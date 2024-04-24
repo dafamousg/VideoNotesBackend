@@ -11,7 +11,7 @@ using VideoNotesBackend.Data;
 namespace VideoNotesBackend.Migrations
 {
     [DbContext(typeof(VideoNotesContext))]
-    partial class VideoNotesDbContextModelSnapshot : ModelSnapshot
+    partial class VideoNotesContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -49,6 +49,23 @@ namespace VideoNotesBackend.Migrations
                     b.ToTable("Notes");
                 });
 
+            modelBuilder.Entity("VideoNotesBackend.Models.Rating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ratings");
+                });
+
             modelBuilder.Entity("VideoNotesBackend.Models.Video", b =>
                 {
                     b.Property<Guid>("Id")
@@ -58,7 +75,7 @@ namespace VideoNotesBackend.Migrations
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
 
-                    b.Property<int?>("Rating")
+                    b.Property<int?>("RatingId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("ReleaseDate")
@@ -69,7 +86,6 @@ namespace VideoNotesBackend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("URL")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Watched")

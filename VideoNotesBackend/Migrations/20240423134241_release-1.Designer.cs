@@ -12,8 +12,8 @@ using VideoNotesBackend.Data;
 namespace VideoNotesBackend.Migrations
 {
     [DbContext(typeof(VideoNotesContext))]
-    [Migration("20240419124114_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240423134241_release-1")]
+    partial class release1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,9 +49,24 @@ namespace VideoNotesBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("VideoId");
-
                     b.ToTable("Notes");
+                });
+
+            modelBuilder.Entity("VideoNotesBackend.Models.Rating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ratings");
                 });
 
             modelBuilder.Entity("VideoNotesBackend.Models.Video", b =>
@@ -63,10 +78,10 @@ namespace VideoNotesBackend.Migrations
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
 
-                    b.Property<int?>("Rating")
+                    b.Property<int?>("RatingId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Released")
+                    b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
@@ -74,7 +89,6 @@ namespace VideoNotesBackend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("URL")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Watched")
@@ -83,20 +97,6 @@ namespace VideoNotesBackend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Videos");
-                });
-
-            modelBuilder.Entity("VideoNotesBackend.Models.Note", b =>
-                {
-                    b.HasOne("VideoNotesBackend.Models.Video", null)
-                        .WithMany("Notes")
-                        .HasForeignKey("VideoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("VideoNotesBackend.Models.Video", b =>
-                {
-                    b.Navigation("Notes");
                 });
 #pragma warning restore 612, 618
         }
