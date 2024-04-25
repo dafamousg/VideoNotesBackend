@@ -6,7 +6,7 @@ using VideoNotesBackend.Models;
 
 namespace VideoNotesBackend.Controllers
 {
-    [Route("api/rating")]
+    [Route("api/Rating")]
     [ApiController]
     public class RatingController : ControllerBase
     {

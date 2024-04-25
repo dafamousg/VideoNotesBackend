@@ -43,6 +43,22 @@ namespace MvcICT.Models
                 );
             }
 
+            if (!context.Notes.Any())
+            {
+                context.Notes.AddRange(
+                    new Note
+                    {
+                        Title = "Note for Ends 1",
+                        CreatedDate = DateTime.UtcNow
+                    },
+                    new Note
+                    {
+                        Title = "Note for Ends 2",
+                        CreatedDate = DateTime.UtcNow.AddDays(-5)
+                    }
+                );
+            }
+
             context.SaveChanges();
         }
     }

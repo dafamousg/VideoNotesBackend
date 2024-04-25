@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VideoNotesBackend.Data;
 
@@ -11,9 +12,11 @@ using VideoNotesBackend.Data;
 namespace VideoNotesBackend.Migrations
 {
     [DbContext(typeof(VideoNotesContext))]
-    partial class VideoNotesContextModelSnapshot : ModelSnapshot
+    [Migration("20240425124328_Updated-Notes-Class")]
+    partial class UpdatedNotesClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,7 +34,7 @@ namespace VideoNotesBackend.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("Edited")
+                    b.Property<DateTime>("Edited")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FreeText")
@@ -41,7 +44,7 @@ namespace VideoNotesBackend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("VideoId")
+                    b.Property<Guid>("VideoId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");

@@ -11,7 +11,7 @@ using VideoNotesBackend.Models;
 namespace VideoNotesBackend.Controllers
 {
     [ApiController]
-    [Route("api/video")]
+    [Route("api/Video")]
     public class VideoController : ControllerBase
     {
         private readonly VideoNotesContext _context;
@@ -32,6 +32,24 @@ namespace VideoNotesBackend.Controllers
             var videos = _context.Videos;
 
             return Ok(videos);
+        }
+
+        [HttpGet(RouteNames.GetById)]
+        public async Task<ActionResult<Video>> GetById(Guid? id)
+        {
+            if (id == null)
+            {
+                return NotFound("Id is null");
+            }
+
+            var video = await _context.Videos.FindAsync(id);
+
+            if (video == null)
+            {
+                return NotFound("Video not found");
+            }
+
+            return Ok(video);
         }
 
         [HttpPost(RouteNames.Create)]
@@ -64,25 +82,6 @@ namespace VideoNotesBackend.Controllers
             return Ok(newVideo);
         }
 
-
-        [HttpGet(RouteNames.GetById)]
-        public async Task<ActionResult<Video>> GetById(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound("Id is null");
-            }
-
-            var video = await _context.Videos.FindAsync(id);
-
-            if (video == null)
-            {
-                return NotFound("Video not found");
-            }
-
-            return Ok(video);
-        }
-
         [HttpPost(RouteNames.Edit)]
         public async Task<ActionResult<Video>> Edit(Guid? id, [FromBody] VideoDto editedVideo)
         {
@@ -111,6 +110,22 @@ namespace VideoNotesBackend.Controllers
             }
 
             return Ok(video);
+        }
+
+        [HttpDelete(RouteNames.Delete)]
+        public async Task<ActionResult<Video>> Delete(Guid? id)
+        {
+            var video = await _context.Videos.FindAsync(id);
+
+            if (video == null)
+            {
+                return NotFound($"Could not find Video with ID: {id}");
+            }
+    
+            _context.Videos.Remove(video);
+            await _context.SaveChangesAsync();
+
+            return Ok("Video deleted successfully");
         }
 
         private static void UpdateVideoProps(Video video, VideoDto editedVideo)

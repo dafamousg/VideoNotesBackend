@@ -7,6 +7,6 @@
         public const string GetById = "GetById";
         public const string Create = "Create";
         public const string Edit = "Edit";
-        
+        public const string Delete = "Delete";
     }
 }
