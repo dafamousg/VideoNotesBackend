@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using VideoNotesBackend.Models;
 
-namespace VideoNotesBackend.ModelDto
+namespace VideoNotesBackend.ModelDto.Video
 {
     public class VideoDto
     {

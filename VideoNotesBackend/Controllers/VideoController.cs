@@ -5,7 +5,7 @@ using Nelibur.ObjectMapper;
 using VideoNotesBackend.Data;
 using VideoNotesBackend.Enums;
 using VideoNotesBackend.Helpers.Validation;
-using VideoNotesBackend.ModelDto;
+using VideoNotesBackend.ModelDto.Video;
 using VideoNotesBackend.Models;
 
 namespace VideoNotesBackend.Controllers
