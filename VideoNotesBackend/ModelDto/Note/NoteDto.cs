@@ -1,4 +1,6 @@
-﻿namespace VideoNotesBackend.ModelDto
+﻿using VideoNotesBackend.Models;
+
+namespace VideoNotesBackend.ModelDto
 {
     public class NoteDto
     {
@@ -11,9 +13,7 @@
 
         public DateTime? Edited { get; set; }
 
-        // Will add Tags later
-        // Not sure if this is correct
-        // public List<string>? Tags { get; private set; } = new List<string>(); // Existing & new
-        
+        public List<Tag>? Tags { get; set; }
+
     }
 }

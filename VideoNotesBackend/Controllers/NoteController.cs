@@ -55,8 +55,8 @@ namespace VideoNotesBackend.Controllers
             return Ok(newNote);
         }
 
-        [HttpPost(RouteNames.Edit)]
-        public async Task<ActionResult<Video>> Edit(Guid? id, [FromBody] NoteDto editedNote)
+        [HttpPost(RouteNames.Update)]
+        public async Task<ActionResult<Video>> Update(Guid? id, [FromBody] NoteDto editedNote)
         {
             if (id == null)
             {

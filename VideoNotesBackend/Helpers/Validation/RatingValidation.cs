@@ -1,11 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using VideoNotesBackend.Models;
 
 namespace VideoNotesBackend.Helpers.Validation
 {
-    public class RatingValidation : ValidationAttribute
+    public class RatingValidation
     {
         public static bool IsValidRating(DbSet<Rating> dbRating, int ratingId)
         {

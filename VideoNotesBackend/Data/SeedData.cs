@@ -59,6 +59,15 @@ namespace MvcICT.Models
                 );
             }
 
+            if (!context.Tags.Any())
+            {
+                context.Tags.AddRange(
+                    new Tag { Name = "PDA" },
+                    new Tag { Name = "Quarter Theory" },
+                    new Tag { Name = "Mindset" }
+                );
+            }
+
             context.SaveChanges();
         }
     }

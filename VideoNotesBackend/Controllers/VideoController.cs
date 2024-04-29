@@ -82,7 +82,7 @@ namespace VideoNotesBackend.Controllers
             return Ok(newVideo);
         }
 
-        [HttpPost(RouteNames.Edit)]
+        [HttpPost(RouteNames.Update)]
         public async Task<ActionResult<Video>> Edit(Guid? id, [FromBody] VideoDto editedVideo)
         {
             if (id == null)

@@ -13,8 +13,6 @@
 
         public DateTime? Edited { get; set; }
 
-        // Will add Tags later
-        // Not sure if this is correct
-        // public List<string>? Tags { get; private set; } = new List<string>(); // Existing & new
+        public List<Tag>? Tags { get; set; } // Existing & new
     }
 }

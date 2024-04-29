@@ -16,13 +16,11 @@ namespace VideoNotesBackend.Models
         
         public int? RatingId { get; set; }
 
-        // Will add tags later
-        // Not sure if this is correct
-        //public string[]? Tags { get; set; }  // Existing & new
-
         [Url(ErrorMessage = "URL is not a valid URL")]
         public string? URL { get; set; }
 
         //public ICollection<Note>? Notes { get; set; }
+
+        public List<Tag>? Tags { get; set; }
     }
 }
