@@ -1,14 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace VideoNotesBackend.Models
+namespace VideoNotesBackend.ModelDto.Tag
 {
-    public class Tag
+    public class TagDto
     {
         public int Id { get; set; }
         [Required]
         public required string Name { get; set; }
-        public List<Note>? Notes { get; set; }
-        public List<Video>? Videos { get; set; }
-
     }
 }

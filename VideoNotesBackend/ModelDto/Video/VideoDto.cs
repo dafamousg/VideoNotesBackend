@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VideoNotesBackend.ModelDto.Tag;
 
 namespace VideoNotesBackend.ModelDto.Video
 {
@@ -11,16 +12,11 @@ namespace VideoNotesBackend.ModelDto.Video
         public DateTime ReleaseDate { get; set; }
         public bool Watched { get; set; }
         public TimeSpan Duration { get; set; }
-
-        // Not sure if this is correct (Update: I think this is okay)
         public int RatingId { get; set; }
-
-        // Will add tags later
-        // Not sure if this is correct
-        //public string[]? Tags { get; set; }  // Existing & new
 
         [Url]
         public string? URL { get; set; }
+        public List<TagDto>? Tags { get; set; }
 
         //public ICollection<Note>? Notes { get; set; }
     }

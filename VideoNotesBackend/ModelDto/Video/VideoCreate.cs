@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VideoNotesBackend.ModelDto.Tag;
 using VideoNotesBackend.Models;
 
 namespace VideoNotesBackend.ModelDto.Video
 {
     public class VideoCreate
     {
-        public string? Title { get; set; }
+        [Required(ErrorMessage = "Title is required")]
+        public required string Title { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime ReleaseDate { get; set; }
@@ -14,13 +16,11 @@ namespace VideoNotesBackend.ModelDto.Video
 
         public int RatingId { get; set; }
 
-        // Will add tags later
-        // Not sure if this is correct
-        //public string[]? Tags { get; set; }  // Existing & new
-
         [Url]
         public string? URL { get; set; }
 
         //public ICollection<Note>? Notes { get; set; }
+
+        public List<TagDto> Tags { get; set; } = new List<TagDto>();
     }
 }

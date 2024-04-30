@@ -19,8 +19,8 @@ namespace VideoNotesBackend.Models
         [Url(ErrorMessage = "URL is not a valid URL")]
         public string? URL { get; set; }
 
-        //public ICollection<Note>? Notes { get; set; }
-
         public List<Tag>? Tags { get; set; }
+
+        //public List<Note>? Notes { get; set; }
     }
 }

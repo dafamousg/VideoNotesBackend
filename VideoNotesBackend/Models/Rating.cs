@@ -9,5 +9,6 @@ namespace VideoNotesBackend.Models
         
         [Required]
         public required string Name { get; set; }
+        public List<Video>? Videos { get; set; }
     }
 }

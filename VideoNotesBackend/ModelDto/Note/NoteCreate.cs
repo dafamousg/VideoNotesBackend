@@ -1,15 +1,15 @@
-﻿using VideoNotesBackend.Models;
+﻿using VideoNotesBackend.ModelDto.Tag;
+using VideoNotesBackend.Models;
 
 namespace VideoNotesBackend.ModelDto
 {
     public class NoteCreate
     {
-        // Not sure of correct
         public Guid? VideoId { get; set; }
         public string? Title { get; set; }
         public string? FreeText { get; set; }
 
-        public List<Tag>? Tags { get; set; }
+        public List<TagDto>? Tags { get; set; }
 
     }
 }

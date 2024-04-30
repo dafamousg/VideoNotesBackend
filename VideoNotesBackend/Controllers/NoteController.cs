@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Nelibur.ObjectMapper;
 using VideoNotesBackend.Data;
@@ -20,7 +19,7 @@ namespace VideoNotesBackend.Controllers
         }
 
         [HttpGet(RouteNames.GetAll)]
-        public ActionResult<Note> Get()
+        public ActionResult<List<NoteDto>> Get()
         {
 
             if (_context.Notes == null)
@@ -28,35 +27,61 @@ namespace VideoNotesBackend.Controllers
                 return NotFound("Notes not found");
             }
 
-            var notes = _context.Notes;
+            var notes = _context.Notes.Include(n => n.Tags).ToList();
 
-            return Ok(notes);
+            TinyMapper.Bind<List<Note>, List<NoteDto>>();
+            var noteNotes = TinyMapper.Map<List<NoteDto>>(notes);
+
+            return Ok(noteNotes);
         }
 
         [HttpPost(RouteNames.Create)]
-        public async Task<ActionResult<Note>> Create(Note newNote)
+        public async Task<ActionResult<NoteDto>> Create(NoteCreate createdNote)
         {
 
-            if (newNote == null)
+            if (createdNote == null)
             {
                 return NotFound("Note object missing");
             }
 
-            newNote.CreatedDate = DateTime.UtcNow;
+            TinyMapper.Bind<NoteCreate, Note>();
+            var convertedNote = TinyMapper.Map<Note>(createdNote);
+
+            if (convertedNote.Tags.Count > 0)
+            {
+                for (var i = 0; i < convertedNote.Tags.Count; i++)
+                {
+                    var tag = convertedNote.Tags[i];
+
+                    if (_context.Tags.Any(t => t.Name.Equals(tag.Name)))
+                    {
+                        var dbTag = _context.Tags.FirstOrDefault(t => t.Name.Equals(tag.Name));
+
+                        if (dbTag != null)
+                        {
+                            convertedNote.Tags.Remove(tag);
+                            convertedNote.Tags.Add(dbTag);
+                        }
+                    }
+                }
+            }
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            _context.Add(newNote);
+            _context.Add(convertedNote);
             await _context.SaveChangesAsync();
 
-            return Ok(newNote);
+            TinyMapper.Bind<Note, NoteDto>();
+            var returnNote = TinyMapper.Map<NoteDto>(convertedNote);
+
+            return Ok(returnNote);
         }
 
         [HttpPost(RouteNames.Update)]
-        public async Task<ActionResult<Video>> Update(Guid? id, [FromBody] NoteDto editedNote)
+        public async Task<ActionResult<NoteDto>> Update(Guid? id, [FromBody] NoteDto editedNote)
         {
             if (id == null)
             {
@@ -84,11 +109,14 @@ namespace VideoNotesBackend.Controllers
                 return NotFound("Video could not be saved");
             }
 
-            return Ok(note);
+            TinyMapper.Bind<Note, NoteDto>();
+            var returnNote = TinyMapper.Map<NoteDto>(note);
+
+            return Ok(returnNote);
         }
 
         [HttpDelete(RouteNames.Delete)]
-        public async Task<ActionResult<Note>> Delete(Guid? id)
+        public async Task<ActionResult<string>> Delete(Guid? id)
         {
             var note = await _context.Notes.FindAsync(id);
 

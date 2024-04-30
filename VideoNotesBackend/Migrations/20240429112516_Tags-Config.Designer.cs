@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VideoNotesBackend.Data;
 
@@ -11,9 +12,11 @@ using VideoNotesBackend.Data;
 namespace VideoNotesBackend.Migrations
 {
     [DbContext(typeof(VideoNotesContext))]
-    partial class VideoNotesContextModelSnapshot : ModelSnapshot
+    [Migration("20240429112516_Tags-Config")]
+    partial class TagsConfig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,36 +24,6 @@ namespace VideoNotesBackend.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("NoteTag", b =>
-                {
-                    b.Property<Guid>("NotesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("TagsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("NotesId", "TagsId");
-
-                    b.HasIndex("TagsId");
-
-                    b.ToTable("NoteTag");
-                });
-
-            modelBuilder.Entity("TagVideo", b =>
-                {
-                    b.Property<int>("TagsId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("VideosId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("TagsId", "VideosId");
-
-                    b.HasIndex("VideosId");
-
-                    b.ToTable("TagVideo");
-                });
 
             modelBuilder.Entity("VideoNotesBackend.Models.Note", b =>
                 {
@@ -108,7 +81,17 @@ namespace VideoNotesBackend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("NoteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("VideoId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("NoteId");
+
+                    b.HasIndex("VideoId");
 
                     b.ToTable("Tags");
                 });
@@ -143,34 +126,25 @@ namespace VideoNotesBackend.Migrations
                     b.ToTable("Videos");
                 });
 
-            modelBuilder.Entity("NoteTag", b =>
+            modelBuilder.Entity("VideoNotesBackend.Models.Tag", b =>
                 {
                     b.HasOne("VideoNotesBackend.Models.Note", null)
-                        .WithMany()
-                        .HasForeignKey("NotesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("VideoNotesBackend.Models.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("TagVideo", b =>
-                {
-                    b.HasOne("VideoNotesBackend.Models.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Tags")
+                        .HasForeignKey("NoteId");
 
                     b.HasOne("VideoNotesBackend.Models.Video", null)
-                        .WithMany()
-                        .HasForeignKey("VideosId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Tags")
+                        .HasForeignKey("VideoId");
+                });
+
+            modelBuilder.Entity("VideoNotesBackend.Models.Note", b =>
+                {
+                    b.Navigation("Tags");
+                });
+
+            modelBuilder.Entity("VideoNotesBackend.Models.Video", b =>
+                {
+                    b.Navigation("Tags");
                 });
 #pragma warning restore 612, 618
         }

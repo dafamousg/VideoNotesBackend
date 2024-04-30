@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Nelibur.ObjectMapper;
 using VideoNotesBackend.Data;
 using VideoNotesBackend.Enums;
+using VideoNotesBackend.ModelDto.Tag;
 using VideoNotesBackend.Models;
 
 namespace VideoNotesBackend.Controllers
@@ -16,20 +18,23 @@ namespace VideoNotesBackend.Controllers
         }
 
         [HttpGet(RouteNames.GetAll)]
-        public ActionResult<Tag> GetAll()
+        public ActionResult<List<TagDto>> GetAll()
         {
             if (_context.Tags == null)
             {
                 return NotFound("Tags not found");
             }
 
-            var tags = _context.Tags;
+            var tags = _context.Tags.ToList();
 
-            return Ok(tags);
+            TinyMapper.Bind<List<Tag>, List<TagDto>>();
+            var returnTag = TinyMapper.Map<List<TagDto>>(tags);
+
+            return Ok(returnTag);
         }
 
         [HttpPost(RouteNames.Create)]
-        public async Task<ActionResult<Note>> Create(Tag newTag)
+        public async Task<ActionResult<TagDto>> Create(Tag newTag)
         {
 
             if (newTag == null)
@@ -45,11 +50,15 @@ namespace VideoNotesBackend.Controllers
             _context.Add(newTag);
             await _context.SaveChangesAsync();
 
-            return Ok(newTag);
+
+            TinyMapper.Bind<Tag, TagDto>();
+            var returnTag = TinyMapper.Map<TagDto>(newTag);
+
+            return Ok(returnTag);
         }
 
         [HttpDelete(RouteNames.Delete)]
-        public async Task<ActionResult<Tag>> Delete(int id)
+        public async Task<ActionResult<string>> Delete(int id)
         {
             var tag = await _context.Tags.FindAsync(id);
 
