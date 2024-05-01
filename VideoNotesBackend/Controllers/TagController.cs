@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Nelibur.ObjectMapper;
 using VideoNotesBackend.Data;
 using VideoNotesBackend.Enums;
+using VideoNotesBackend.Helpers.Converter;
 using VideoNotesBackend.ModelDto.Tag;
 using VideoNotesBackend.Models;
 
@@ -27,8 +27,7 @@ namespace VideoNotesBackend.Controllers
 
             var tags = _context.Tags.ToList();
 
-            TinyMapper.Bind<List<Tag>, List<TagDto>>();
-            var returnTag = TinyMapper.Map<List<TagDto>>(tags);
+            var returnTag = Converter.TypeToDto<List<Tag>, List<TagDto>>(tags);
 
             return Ok(returnTag);
         }
@@ -50,9 +49,7 @@ namespace VideoNotesBackend.Controllers
             _context.Add(newTag);
             await _context.SaveChangesAsync();
 
-
-            TinyMapper.Bind<Tag, TagDto>();
-            var returnTag = TinyMapper.Map<TagDto>(newTag);
+            var returnTag = Converter.TypeToDto<Tag, TagDto>(newTag);
 
             return Ok(returnTag);
         }

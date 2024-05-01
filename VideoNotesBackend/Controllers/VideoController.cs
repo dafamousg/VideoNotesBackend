@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Nelibur.ObjectMapper;
 using VideoNotesBackend.Data;
 using VideoNotesBackend.Enums;
+using VideoNotesBackend.Helpers.Converter;
 using VideoNotesBackend.Helpers.Validation;
 using VideoNotesBackend.ModelDto.Video;
 using VideoNotesBackend.Models;
@@ -22,38 +21,42 @@ namespace VideoNotesBackend.Controllers
         }
 
         [HttpGet(RouteNames.GetAll)]
-        public ActionResult<Video> Get()
+        public ActionResult<List<VideoDto>> Get()
         {
             if (_context.Videos == null)
             {
                 return NotFound("No videos found");
             }
 
-            var videos = _context.Videos;
+            var videos = _context.Videos.Include(v => v.Tags).ToList();
 
-            return Ok(videos);
+            var returnVideos = Converter.TypeToDto<List<Video>, List<VideoDto>>(videos);
+
+            return Ok(returnVideos);
         }
 
         [HttpGet(RouteNames.GetById)]
-        public async Task<ActionResult<Video>> GetById(Guid? id)
+        public async Task<ActionResult<VideoDto>> GetById(Guid? id)
         {
             if (id == null)
             {
                 return NotFound("Id is null");
             }
 
-            var video = await _context.Videos.FindAsync(id);
+            var video = await _context.Videos.Include(v => v.Tags).SingleOrDefaultAsync(v => v.Id == id);
 
             if (video == null)
             {
                 return NotFound("Video not found");
             }
 
-            return Ok(video);
+            var returnVideo = Converter.TypeToDto<Video, VideoDto>(video);
+
+            return Ok(returnVideo);
         }
 
         [HttpPost(RouteNames.Create)]
-        public async Task<ActionResult<Video>> Create(VideoCreate video)
+        public async Task<ActionResult<VideoDto>> Create(VideoCreate video)
         {
             if (video == null)
             {
@@ -73,24 +76,25 @@ namespace VideoNotesBackend.Controllers
                 return BadRequest(ModelState);
             }
 
-            TinyMapper.Bind<VideoCreate, Video>();
-            var newVideo = TinyMapper.Map<Video>(video);
+            var newVideo = Converter.TypeToDto<VideoCreate, Video>(video);
 
             _context.Add(newVideo);
             await _context.SaveChangesAsync();
 
-            return Ok(newVideo);
+            var returnVideo = Converter.TypeToDto<Video, VideoDto>(newVideo);
+
+            return Ok(returnVideo);
         }
 
         [HttpPost(RouteNames.Update)]
-        public async Task<ActionResult<Video>> Edit(Guid? id, [FromBody] VideoDto editedVideo)
+        public async Task<ActionResult<VideoDto>> Edit(Guid? id, [FromBody] VideoDto editedVideo)
         {
             if (id == null)
             {
                 return NotFound("Id is null");
             }
 
-            var video = await _context.Videos.FindAsync(id);
+            var video = await _context.Videos.Include(v => v.Tags).SingleOrDefaultAsync(v => v.Id == id);
 
             if (video == null)
             {
@@ -109,11 +113,13 @@ namespace VideoNotesBackend.Controllers
                 return NotFound("Video could not be saved");
             }
 
-            return Ok(video);
+            var returnVideo = Converter.TypeToDto<Video, VideoDto>(video);
+
+            return Ok(returnVideo);
         }
 
         [HttpDelete(RouteNames.Delete)]
-        public async Task<ActionResult<Video>> Delete(Guid? id)
+        public async Task<ActionResult<string>> Delete(Guid? id)
         {
             var video = await _context.Videos.FindAsync(id);
 
@@ -130,8 +136,7 @@ namespace VideoNotesBackend.Controllers
 
         private static void UpdateVideoProps(Video video, VideoDto editedVideo)
         {
-            TinyMapper.Bind<VideoDto, Video>();
-            var newVideo = TinyMapper.Map<Video>(editedVideo);
+            var newVideo = Converter.TypeToDto<VideoDto, Video>(editedVideo);
 
             var videoProperties = typeof(Video).GetProperties()
                 .Where(p => p.Name != nameof(Video.Id));

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Nelibur.ObjectMapper;
 using VideoNotesBackend.Data;
 using VideoNotesBackend.Enums;
+using VideoNotesBackend.Helpers.Converter;
 using VideoNotesBackend.ModelDto;
 using VideoNotesBackend.Models;
 
@@ -29,10 +29,9 @@ namespace VideoNotesBackend.Controllers
 
             var notes = _context.Notes.Include(n => n.Tags).ToList();
 
-            TinyMapper.Bind<List<Note>, List<NoteDto>>();
-            var noteNotes = TinyMapper.Map<List<NoteDto>>(notes);
+            var convNote = Converter.TypeToDto<List<Note>, List<NoteDto>>(notes);
 
-            return Ok(noteNotes);
+            return Ok(convNote);
         }
 
         [HttpPost(RouteNames.Create)]
@@ -44,8 +43,7 @@ namespace VideoNotesBackend.Controllers
                 return NotFound("Note object missing");
             }
 
-            TinyMapper.Bind<NoteCreate, Note>();
-            var convertedNote = TinyMapper.Map<Note>(createdNote);
+            var convertedNote = Converter.TypeToDto<NoteCreate, Note>(createdNote);
 
             if (convertedNote.Tags.Count > 0)
             {
@@ -74,8 +72,7 @@ namespace VideoNotesBackend.Controllers
             _context.Add(convertedNote);
             await _context.SaveChangesAsync();
 
-            TinyMapper.Bind<Note, NoteDto>();
-            var returnNote = TinyMapper.Map<NoteDto>(convertedNote);
+            var returnNote = Converter.TypeToDto<Note, NoteDto>(convertedNote);
 
             return Ok(returnNote);
         }
@@ -88,7 +85,7 @@ namespace VideoNotesBackend.Controllers
                 return NotFound("Id is null");
             }
 
-            var note = await _context.Notes.FindAsync(id);
+            var note = await _context.Notes.Include(n => n.Tags).SingleOrDefaultAsync(n => n.Id == id);
 
             if (note == null)
             {
@@ -109,8 +106,7 @@ namespace VideoNotesBackend.Controllers
                 return NotFound("Video could not be saved");
             }
 
-            TinyMapper.Bind<Note, NoteDto>();
-            var returnNote = TinyMapper.Map<NoteDto>(note);
+            var returnNote = Converter.TypeToDto<Note, NoteDto>(note);
 
             return Ok(returnNote);
         }
@@ -133,8 +129,7 @@ namespace VideoNotesBackend.Controllers
 
         private static void UpdateNoteProps(Note note, NoteDto editedNote)
         {
-            TinyMapper.Bind<NoteDto, Note>();
-            var newNote = TinyMapper.Map<Note>(editedNote);
+            var newNote = Converter.TypeToDto<NoteDto, Note>(editedNote);
 
             var videoProperties = typeof(Note).GetProperties()
                 .Where(p => p.Name != nameof(Note.Id) && p.Name != nameof(Note.CreatedDate));

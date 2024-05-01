@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VideoNotesBackend.Data;
 using VideoNotesBackend.Enums;
+using VideoNotesBackend.Helpers.Converter;
+using VideoNotesBackend.ModelDto.Rating;
 using VideoNotesBackend.Models;
 
 namespace VideoNotesBackend.Controllers
@@ -17,20 +19,22 @@ namespace VideoNotesBackend.Controllers
         }
 
         [HttpGet(RouteNames.GetAll)]
-        public ActionResult<Rating> Get()
+        public ActionResult<List<RatingDto>> Get()
         {
             if(_context.Ratings == null)
             {
                 return NotFound("No ratings found");
             }
 
-            var ratings = _context.Ratings;
+            var ratings = _context.Ratings.ToList();
 
-            return Ok(ratings);
+            var returnRating = Converter.TypeToDto<List<Rating>, List<RatingDto>>(ratings);
+
+            return Ok(returnRating);
         }
         
         [HttpPost(RouteNames.Create)]
-        public async Task<ActionResult<Rating>> Create(Rating rating)
+        public async Task<ActionResult<RatingDto>> Create(Rating rating)
         {
             if(rating == null)
             {
@@ -45,7 +49,9 @@ namespace VideoNotesBackend.Controllers
             _context.Add(rating);
             await _context.SaveChangesAsync();
 
-            return Ok(rating);
+            var returnRating = Converter.TypeToDto<Rating, RatingDto>(rating);
+
+            return Ok(returnRating);
         }
     }
 }
