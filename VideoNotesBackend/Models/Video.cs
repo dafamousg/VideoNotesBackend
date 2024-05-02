@@ -14,7 +14,7 @@ namespace VideoNotesBackend.Models
         public bool Watched { get; set; }
         public TimeSpan Duration { get; set; }
         
-        public int? RatingId { get; set; }
+        public Rating? Rating { get; set; }
 
         [Url(ErrorMessage = "URL is not a valid URL")]
         public string? URL { get; set; }

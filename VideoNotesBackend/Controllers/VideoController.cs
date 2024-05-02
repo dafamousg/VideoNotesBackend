@@ -28,7 +28,7 @@ namespace VideoNotesBackend.Controllers
                 return NotFound("No videos found");
             }
 
-            var videos = _context.Videos.Include(v => v.Tags).ToList();
+            var videos = _context.Videos.Include(v => v.Tags).Include(r => r.Rating).ToList();
 
             var returnVideos = Converter.TypeToDto<List<Video>, List<VideoDto>>(videos);
 
@@ -43,7 +43,7 @@ namespace VideoNotesBackend.Controllers
                 return NotFound("Id is null");
             }
 
-            var video = await _context.Videos.Include(v => v.Tags).SingleOrDefaultAsync(v => v.Id == id);
+            var video = await _context.Videos.Include(v => v.Tags).Include(r => r.Rating).SingleOrDefaultAsync(v => v.Id == id);
 
             if (video == null)
             {
@@ -68,15 +68,21 @@ namespace VideoNotesBackend.Controllers
                 return BadRequest(ModelState);
             }
 
-            var ratingArray = _context.Ratings;
-
-            if (!RatingValidation.IsValidRating(ratingArray, video.RatingId))
-            {
-                ModelState.AddModelError(nameof(video.RatingId), $"Invalid rating value: {video.RatingId}");
-                return BadRequest(ModelState);
-            }
-
             var newVideo = Converter.TypeToDto<VideoCreate, Video>(video);
+
+            Rating? rating;
+
+            if (video.Rating != null)
+            {
+                rating = await _context.Ratings.SingleOrDefaultAsync(r => r.Id == video.Rating.Id);
+
+                if (rating == null)
+                {
+                    return BadRequest("Invalid rating value.");
+                }
+
+                newVideo.Rating = rating;
+            }
 
             _context.Add(newVideo);
             await _context.SaveChangesAsync();
@@ -87,14 +93,14 @@ namespace VideoNotesBackend.Controllers
         }
 
         [HttpPost(RouteNames.Update)]
-        public async Task<ActionResult<VideoDto>> Edit(Guid? id, [FromBody] VideoDto editedVideo)
+        public async Task<ActionResult<VideoDto>> Update(Guid? id, [FromBody] VideoDto editedVideo)
         {
             if (id == null)
             {
                 return NotFound("Id is null");
             }
 
-            var video = await _context.Videos.Include(v => v.Tags).SingleOrDefaultAsync(v => v.Id == id);
+            var video = await _context.Videos.Include(v => v.Tags).Include(r => r.Rating).SingleOrDefaultAsync(v => v.Id == id);
 
             if (video == null)
             {

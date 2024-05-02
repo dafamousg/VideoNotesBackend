@@ -12,8 +12,8 @@ using VideoNotesBackend.Data;
 namespace VideoNotesBackend.Migrations
 {
     [DbContext(typeof(VideoNotesContext))]
-    [Migration("20240425125521_Note-Edited-Is-Nullable")]
-    partial class NoteEditedIsNullable
+    [Migration("20240502140850_Fix_Video_Rating")]
+    partial class Fix_Video_Rating
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,36 @@ namespace VideoNotesBackend.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("NoteTag", b =>
+                {
+                    b.Property<Guid>("NotesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("TagsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("NotesId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("NoteTag");
+                });
+
+            modelBuilder.Entity("TagVideo", b =>
+                {
+                    b.Property<int>("TagsId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("VideosId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("TagsId", "VideosId");
+
+                    b.HasIndex("VideosId");
+
+                    b.ToTable("TagVideo");
+                });
 
             modelBuilder.Entity("VideoNotesBackend.Models.Note", b =>
                 {
@@ -44,7 +74,7 @@ namespace VideoNotesBackend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("VideoId")
+                    b.Property<Guid?>("VideoId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -67,6 +97,23 @@ namespace VideoNotesBackend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Ratings");
+                });
+
+            modelBuilder.Entity("VideoNotesBackend.Models.Tag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("VideoNotesBackend.Models.Video", b =>
@@ -96,7 +143,53 @@ namespace VideoNotesBackend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("RatingId");
+
                     b.ToTable("Videos");
+                });
+
+            modelBuilder.Entity("NoteTag", b =>
+                {
+                    b.HasOne("VideoNotesBackend.Models.Note", null)
+                        .WithMany()
+                        .HasForeignKey("NotesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VideoNotesBackend.Models.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TagVideo", b =>
+                {
+                    b.HasOne("VideoNotesBackend.Models.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VideoNotesBackend.Models.Video", null)
+                        .WithMany()
+                        .HasForeignKey("VideosId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("VideoNotesBackend.Models.Video", b =>
+                {
+                    b.HasOne("VideoNotesBackend.Models.Rating", "Rating")
+                        .WithMany("Videos")
+                        .HasForeignKey("RatingId");
+
+                    b.Navigation("Rating");
+                });
+
+            modelBuilder.Entity("VideoNotesBackend.Models.Rating", b =>
+                {
+                    b.Navigation("Videos");
                 });
 #pragma warning restore 612, 618
         }

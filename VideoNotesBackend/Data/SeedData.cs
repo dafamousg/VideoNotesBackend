@@ -12,13 +12,13 @@ namespace MvcICT.Models
                 serviceProvider.GetRequiredService<
                     DbContextOptions<VideoNotesContext>>());
 
+            Rating r1 = new Rating { Name = "Not Informative" },
+                r2 = new Rating { Name = "Partially Informative" },
+                r3 = new Rating { Name = "Highly Informative" };
+
             if (!context.Ratings.Any())
             {
-                context.Ratings.AddRange(
-                    new Rating { Name = "Not Informative" },
-                    new Rating { Name = "Partially Informative" },
-                    new Rating { Name = "Highly Informative" }
-                );
+                context.Ratings.AddRange(r1,r2,r3);
             }
 
             if (!context.Videos.Any())
@@ -29,7 +29,7 @@ namespace MvcICT.Models
                         Title = "Ends Vol. 1",
                         ReleaseDate = DateTime.Parse("2022-06-20"),
                         Watched = false,
-                        RatingId = 1,
+                        Rating = r1,
                         URL = "https://www.youtube.com/watch?v=ASxSiOi6nJI&list=PLVgHx4Z63pabcsTrvY5XsVdsvTN2ho6pz&index=2"
                     },
                     new Video
@@ -37,7 +37,7 @@ namespace MvcICT.Models
                         Title = "Ends Vol. 2",
                         ReleaseDate = DateTime.Parse("2022-08-06"),
                         Watched = false,
-                        RatingId = 3,
+                        Rating = r3,
                         URL = "https://www.youtube.com/watch?v=Tex87Lo2HdE&list=PLVgHx4Z63pabcsTrvY5XsVdsvTN2ho6pz&index=2"
                     }
                 );

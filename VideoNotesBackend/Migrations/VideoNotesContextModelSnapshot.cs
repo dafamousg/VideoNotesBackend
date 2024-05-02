@@ -140,6 +140,8 @@ namespace VideoNotesBackend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("RatingId");
+
                     b.ToTable("Videos");
                 });
 
@@ -171,6 +173,20 @@ namespace VideoNotesBackend.Migrations
                         .HasForeignKey("VideosId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("VideoNotesBackend.Models.Video", b =>
+                {
+                    b.HasOne("VideoNotesBackend.Models.Rating", "Rating")
+                        .WithMany("Videos")
+                        .HasForeignKey("RatingId");
+
+                    b.Navigation("Rating");
+                });
+
+            modelBuilder.Entity("VideoNotesBackend.Models.Rating", b =>
+                {
+                    b.Navigation("Videos");
                 });
 #pragma warning restore 612, 618
         }
