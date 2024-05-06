@@ -139,7 +139,12 @@ namespace VideoNotesBackend.Controllers
                 var newValue = property.GetValue(newNote);
                 var currentValue = property.GetValue(note);
 
-                if (newValue != null && !newValue.Equals(currentValue))
+                // Checks if the prop is non-value type      
+                var isNullable = !property.PropertyType.IsValueType ||
+                    // Checks if the property is a nullable Value type
+                    Nullable.GetUnderlyingType(property.PropertyType) != null;
+
+                if (isNullable || (newValue != null && !newValue.Equals(currentValue)))
                 {
                     property.SetValue(note, newValue);
                 }

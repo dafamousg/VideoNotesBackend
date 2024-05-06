@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using VideoNotesBackend.Data;
 using VideoNotesBackend.Enums;
 using VideoNotesBackend.Helpers.Converter;
-using VideoNotesBackend.Helpers.Validation;
 using VideoNotesBackend.ModelDto.Video;
 using VideoNotesBackend.Models;
 
@@ -133,7 +132,7 @@ namespace VideoNotesBackend.Controllers
             {
                 return NotFound($"Could not find Video with ID: {id}");
             }
-    
+
             _context.Videos.Remove(video);
             await _context.SaveChangesAsync();
 
@@ -152,7 +151,13 @@ namespace VideoNotesBackend.Controllers
                 var newValue = property.GetValue(newVideo);
                 var currentValue = property.GetValue(video);
 
-                if (newValue != null && !newValue.Equals(currentValue))
+
+                // Checks if the prop is non-value type      
+                var isNullable = !property.PropertyType.IsValueType ||
+                    // Checks if the property is a nullable Value type
+                    Nullable.GetUnderlyingType(property.PropertyType) != null;
+
+                if (isNullable || (newValue != null && !newValue.Equals(currentValue)))
                 {
                     property.SetValue(video, newValue);
                 }
