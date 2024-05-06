@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VideoNotesBackend.ModelDto.Note;
 using VideoNotesBackend.ModelDto.Rating;
 using VideoNotesBackend.ModelDto.Tag;
 
@@ -19,8 +20,8 @@ namespace VideoNotesBackend.ModelDto.Video
         [Url]
         public string? URL { get; set; }
 
-        //public ICollection<Note>? Notes { get; set; }
-
         public List<TagDto> Tags { get; set; } = new List<TagDto>();
+
+        public List<NoteConnect>? Notes { get; set; }
     }
 }

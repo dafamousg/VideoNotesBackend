@@ -21,6 +21,6 @@ namespace VideoNotesBackend.Models
 
         public List<Tag>? Tags { get; set; }
 
-        //public List<Note>? Notes { get; set; }
+        public List<Note>? Notes { get; set; }
     }
 }

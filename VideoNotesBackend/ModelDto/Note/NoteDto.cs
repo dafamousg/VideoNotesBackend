@@ -7,7 +7,7 @@ namespace VideoNotesBackend.ModelDto
         public Guid Id { get; set; }
 
         public Guid? VideoId { get; set; }
-        public string? Title { get; set; }
+        public required string Title { get; set; }
         public string? FreeText { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? Edited { get; set; }

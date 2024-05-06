@@ -131,10 +131,10 @@ namespace VideoNotesBackend.Controllers
         {
             var newNote = Converter.TypeToDto<NoteDto, Note>(editedNote);
 
-            var videoProperties = typeof(Note).GetProperties()
+            var noteProperties = typeof(Note).GetProperties()
                 .Where(p => p.Name != nameof(Note.Id) && p.Name != nameof(Note.CreatedDate));
 
-            foreach (var property in videoProperties)
+            foreach (var property in noteProperties)
             {
                 var newValue = property.GetValue(newNote);
                 var currentValue = property.GetValue(note);
@@ -144,7 +144,9 @@ namespace VideoNotesBackend.Controllers
                     // Checks if the property is a nullable Value type
                     Nullable.GetUnderlyingType(property.PropertyType) != null;
 
-                if (isNullable || (newValue != null && !newValue.Equals(currentValue)))
+                bool isNullableEntry = isNullable || (!isNullable && newValue != null);
+
+                if (isNullableEntry && !newValue.Equals(currentValue))
                 {
                     property.SetValue(note, newValue);
                 }

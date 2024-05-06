@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VideoNotesBackend.Models
 {
@@ -6,6 +7,7 @@ namespace VideoNotesBackend.Models
     {
         public Guid Id { get; set; }
 
+        [ForeignKey("Video")]
         public Guid? VideoId { get; set; }
 
         [Required(ErrorMessage = "Title is required")]

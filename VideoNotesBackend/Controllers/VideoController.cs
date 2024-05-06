@@ -27,7 +27,11 @@ namespace VideoNotesBackend.Controllers
                 return NotFound("No videos found");
             }
 
-            var videos = _context.Videos.Include(v => v.Tags).Include(r => r.Rating).ToList();
+            var videos = _context.Videos
+                .Include(v => v.Tags)
+                .Include(v => v.Rating)
+                .Include(v => v.Notes)
+                .ToList();
 
             var returnVideos = Converter.TypeToDto<List<Video>, List<VideoDto>>(videos);
 
@@ -42,7 +46,11 @@ namespace VideoNotesBackend.Controllers
                 return NotFound("Id is null");
             }
 
-            var video = await _context.Videos.Include(v => v.Tags).Include(r => r.Rating).SingleOrDefaultAsync(v => v.Id == id);
+            var video = await _context.Videos
+                .Include(v => v.Tags)
+                .Include(v => v.Rating)
+                .Include(v => v.Notes)
+                .SingleOrDefaultAsync(v => v.Id == id);
 
             if (video == null)
             {
@@ -69,11 +77,10 @@ namespace VideoNotesBackend.Controllers
 
             var newVideo = Converter.TypeToDto<VideoCreate, Video>(video);
 
-            Rating? rating;
 
             if (video.Rating != null)
             {
-                rating = await _context.Ratings.SingleOrDefaultAsync(r => r.Id == video.Rating.Id);
+                var rating = await _context.Ratings.SingleOrDefaultAsync(r => r.Id == video.Rating.Id);
 
                 if (rating == null)
                 {
@@ -81,6 +88,26 @@ namespace VideoNotesBackend.Controllers
                 }
 
                 newVideo.Rating = rating;
+            }
+
+            if (video.Notes != null)
+            {
+                var noteList = new List<Note>();
+                foreach (var note in video.Notes)
+                {
+                    var n = _context.Notes.Find(note.Id);
+
+                    if (n != null)
+                    {
+                        noteList.Add(n);
+                    }
+                    else
+                    {
+                        return NotFound($"No note found with ID: {note.Id}");
+                    }
+                }
+
+                newVideo.Notes = noteList;
             }
 
             _context.Add(newVideo);
@@ -99,7 +126,11 @@ namespace VideoNotesBackend.Controllers
                 return NotFound("Id is null");
             }
 
-            var video = await _context.Videos.Include(v => v.Tags).Include(r => r.Rating).SingleOrDefaultAsync(v => v.Id == id);
+            var video = await _context.Videos
+                .Include(v => v.Tags)
+                .Include(v => v.Rating)
+                .Include(v => v.Notes)
+                .SingleOrDefaultAsync(v => v.Id == id);
 
             if (video == null)
             {
@@ -157,7 +188,9 @@ namespace VideoNotesBackend.Controllers
                     // Checks if the property is a nullable Value type
                     Nullable.GetUnderlyingType(property.PropertyType) != null;
 
-                if (isNullable || (newValue != null && !newValue.Equals(currentValue)))
+                bool isNullableEntry = isNullable || (!isNullable && newValue != null);
+
+                if (isNullableEntry && !newValue.Equals(currentValue))
                 {
                     property.SetValue(video, newValue);
                 }

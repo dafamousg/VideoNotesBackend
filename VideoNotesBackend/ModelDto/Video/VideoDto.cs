@@ -20,6 +20,6 @@ namespace VideoNotesBackend.ModelDto.Video
         public string? URL { get; set; }
         public List<TagDto>? Tags { get; set; }
 
-        //public ICollection<Note>? Notes { get; set; }
+        public List<NoteDto>? Notes { get; set; }
     }
 }
