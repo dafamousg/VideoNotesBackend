@@ -12,9 +12,9 @@ namespace MvcICT.Models
                 serviceProvider.GetRequiredService<
                     DbContextOptions<VideoNotesContext>>());
 
-            Rating r1 = new Rating { Name = "Not Informative" },
-                r2 = new Rating { Name = "Partially Informative" },
-                r3 = new Rating { Name = "Highly Informative" };
+            Rating r1 = new() { Name = "Not Informative" },
+                r2 = new() { Name = "Partially Informative" },
+                r3 = new() { Name = "Highly Informative" };
 
             if (!context.Ratings.Any())
             {

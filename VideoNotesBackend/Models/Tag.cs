@@ -2,9 +2,11 @@
 
 namespace VideoNotesBackend.Models
 {
-    public class Tag
+    public class Tag: IEntity
     {
-        public int Id { get; set; }
+        [Key]
+        [Required]
+        public Guid Id { get; set; } = new Guid();
         [Required]
         public required string Name { get; set; }
         public List<Note>? Notes { get; set; }

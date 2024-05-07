@@ -5,7 +5,7 @@ using VideoNotesBackend.Models;
 
 namespace VideoNotesBackend.ModelDto.Video
 {
-    public class VideoDto
+    public class VideoDto: IEntity
     {
         public Guid Id { get; set; }
         public string? Title { get; set; }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using VideoNotesBackend.Data;
 using VideoNotesBackend.Enums;
+using VideoNotesBackend.Helpers;
 using VideoNotesBackend.Helpers.Converter;
 using VideoNotesBackend.ModelDto.Video;
 using VideoNotesBackend.Models;
@@ -138,7 +139,7 @@ namespace VideoNotesBackend.Controllers
             }
 
             // Compare and Update the video
-            UpdateVideoProps(video, editedVideo);
+            await UpdateVideoProps(video, editedVideo);
 
             try
             {
@@ -170,9 +171,22 @@ namespace VideoNotesBackend.Controllers
             return Ok("Video deleted successfully");
         }
 
-        private static void UpdateVideoProps(Video video, VideoDto editedVideo)
+        private async Task UpdateVideoProps(Video video, VideoDto editedVideo)
         {
             var newVideo = Converter.TypeToDto<VideoDto, Video>(editedVideo);
+
+            if (newVideo.Tags != null)
+            {
+                newVideo.Tags = [.. await Trackers.AssociateChildEntitiesAsync(newVideo.Tags, _context)];
+            }
+            if (newVideo.Notes != null)
+            {
+                newVideo.Notes = [.. await Trackers.AssociateChildEntitiesAsync(newVideo.Notes, _context)];
+            }
+            if (newVideo.Rating != null)
+            {
+                newVideo.Rating = await Trackers.AssociateChildEntityAsync(newVideo.Rating, _context);
+            }
 
             var videoProperties = typeof(Video).GetProperties()
                 .Where(p => p.Name != nameof(Video.Id));
@@ -189,8 +203,10 @@ namespace VideoNotesBackend.Controllers
                     Nullable.GetUnderlyingType(property.PropertyType) != null;
 
                 bool isNullableEntry = isNullable || (!isNullable && newValue != null);
+                bool valueCheck = (newValue == null && currentValue != null) ||
+                    (newValue != null && !newValue.Equals(currentValue));
 
-                if (isNullableEntry && !newValue.Equals(currentValue))
+                if (isNullableEntry && valueCheck)
                 {
                     property.SetValue(video, newValue);
                 }

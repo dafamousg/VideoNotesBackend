@@ -27,8 +27,8 @@ namespace VideoNotesBackend.Migrations
                     b.Property<Guid>("NotesId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("TagsId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TagsId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("NotesId", "TagsId");
 
@@ -39,8 +39,8 @@ namespace VideoNotesBackend.Migrations
 
             modelBuilder.Entity("TagVideo", b =>
                 {
-                    b.Property<int>("TagsId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TagsId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("VideosId")
                         .HasColumnType("uniqueidentifier");
@@ -76,16 +76,16 @@ namespace VideoNotesBackend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("VideoId");
+
                     b.ToTable("Notes");
                 });
 
             modelBuilder.Entity("VideoNotesBackend.Models.Rating", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -98,11 +98,9 @@ namespace VideoNotesBackend.Migrations
 
             modelBuilder.Entity("VideoNotesBackend.Models.Tag", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -122,8 +120,8 @@ namespace VideoNotesBackend.Migrations
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
 
-                    b.Property<int?>("RatingId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("RatingId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
@@ -175,6 +173,13 @@ namespace VideoNotesBackend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("VideoNotesBackend.Models.Note", b =>
+                {
+                    b.HasOne("VideoNotesBackend.Models.Video", null)
+                        .WithMany("Notes")
+                        .HasForeignKey("VideoId");
+                });
+
             modelBuilder.Entity("VideoNotesBackend.Models.Video", b =>
                 {
                     b.HasOne("VideoNotesBackend.Models.Rating", "Rating")
@@ -187,6 +192,11 @@ namespace VideoNotesBackend.Migrations
             modelBuilder.Entity("VideoNotesBackend.Models.Rating", b =>
                 {
                     b.Navigation("Videos");
+                });
+
+            modelBuilder.Entity("VideoNotesBackend.Models.Video", b =>
+                {
+                    b.Navigation("Notes");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,10 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using VideoNotesBackend.Models;
 
 namespace VideoNotesBackend.ModelDto.Rating
 {
-    public class RatingDto
+    public class RatingDto: IEntity
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string? Name { get; set; }
     }

@@ -3,9 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VideoNotesBackend.Models
 {
-    public class Note
+    public class Note: IEntity
     {
-        public Guid Id { get; set; }
+        [Key]
+        [Required]
+        public Guid Id { get; set; } = new Guid();
 
         [ForeignKey("Video")]
         public Guid? VideoId { get; set; }

@@ -2,9 +2,11 @@
 
 namespace VideoNotesBackend.Models
 {
-    public class Video
+    public class Video: IEntity
     {
-        public Guid Id { get; set; }
+        [Key]
+        [Required]
+        public Guid Id { get; set; } = new Guid();
 
         [Required(ErrorMessage = "Title is required")]
         public required string Title { get; set; }

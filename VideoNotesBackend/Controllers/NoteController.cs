@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using VideoNotesBackend.Data;
 using VideoNotesBackend.Enums;
+using VideoNotesBackend.Helpers;
 using VideoNotesBackend.Helpers.Converter;
 using VideoNotesBackend.ModelDto;
 using VideoNotesBackend.Models;
@@ -85,7 +86,7 @@ namespace VideoNotesBackend.Controllers
                 return NotFound("Id is null");
             }
 
-            var note = await _context.Notes.Include(n => n.Tags).SingleOrDefaultAsync(n => n.Id == id);
+            var note = await _context.Notes.Include(n => n.Tags).FirstOrDefaultAsync(n => n.Id == id);
 
             if (note == null)
             {
@@ -95,7 +96,7 @@ namespace VideoNotesBackend.Controllers
             editedNote.Edited = DateTime.UtcNow;
 
             // Compare and Update the video
-            UpdateNoteProps(note, editedNote);
+            await UpdateNoteProps(note, editedNote);
 
             try
             {
@@ -127,9 +128,14 @@ namespace VideoNotesBackend.Controllers
             return Ok("Note deleted successfully");
         }
 
-        private static void UpdateNoteProps(Note note, NoteDto editedNote)
+        private async Task UpdateNoteProps(Note note, NoteDto editedNote)
         {
             var newNote = Converter.TypeToDto<NoteDto, Note>(editedNote);
+
+            if (newNote.Tags != null)
+            {
+                newNote.Tags = [.. await Trackers.AssociateChildEntitiesAsync(newNote.Tags, _context)];
+            }
 
             var noteProperties = typeof(Note).GetProperties()
                 .Where(p => p.Name != nameof(Note.Id) && p.Name != nameof(Note.CreatedDate));
@@ -145,8 +151,9 @@ namespace VideoNotesBackend.Controllers
                     Nullable.GetUnderlyingType(property.PropertyType) != null;
 
                 bool isNullableEntry = isNullable || (!isNullable && newValue != null);
+                bool valueCheck = (newValue == null && currentValue != null) || (newValue != null && !newValue.Equals(currentValue));
 
-                if (isNullableEntry && !newValue.Equals(currentValue))
+                if (isNullableEntry && valueCheck)
                 {
                     property.SetValue(note, newValue);
                 }

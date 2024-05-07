@@ -2,10 +2,11 @@
 
 namespace VideoNotesBackend.Models
 {
-    public class Rating
+    public class Rating: IEntity
     {
+        [Key]
         [Required]
-        public int Id { get; set; }
+        public Guid Id { get; set; } = new Guid();
         
         [Required]
         public required string Name { get; set; }

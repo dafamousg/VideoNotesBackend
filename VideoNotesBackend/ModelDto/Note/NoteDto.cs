@@ -1,8 +1,9 @@
 ﻿using VideoNotesBackend.ModelDto.Tag;
+using VideoNotesBackend.Models;
 
 namespace VideoNotesBackend.ModelDto
 {
-    public class NoteDto
+    public class NoteDto: IEntity
     {
         public Guid Id { get; set; }
 
