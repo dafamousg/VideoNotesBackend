@@ -158,7 +158,9 @@ namespace VideoNotesBackend.Controllers
         [HttpDelete(RouteNames.Delete)]
         public async Task<ActionResult<string>> Delete(Guid? id)
         {
-            var video = await _context.Videos.FindAsync(id);
+            var video = await _context.Videos
+                .Include(v => v.Notes)
+                .FirstOrDefaultAsync(v => v.Id == id);
 
             if (video == null)
             {
